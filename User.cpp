@@ -26,8 +26,6 @@ User::User(MyString&& username, MyString&& password, MyString&& firstName, MyStr
 
 void User::addMoney(double amount)
 {
-	if (amount <= 0)
-		return;
 	this->balance += amount;
 }
 

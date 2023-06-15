@@ -14,4 +14,7 @@ public:
 	Address(const MyString& name, int x, int y);
 	Address(MyString&& name, int x, int y, MyString&& description);
 	Address(MyString&& name, int x, int y);
+
+	int getX() const;
+	int getY() const;
 };

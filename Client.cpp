@@ -6,3 +6,8 @@ Client::Client(MyString&& username, MyString&& password, MyString&& firstName, M
 Client::Client(const MyString& username, const MyString& password, const MyString& firstName, const MyString& lastName)
 	:User(username, password, firstName, lastName) {}
 
+bool Client::isClient() const
+{
+	return true;
+}
+

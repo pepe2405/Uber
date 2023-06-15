@@ -10,9 +10,9 @@ class Driver : public User
 	Address address = { "Unknown", 0, 0, "" };
 	int ratingCount = 0;
 	double ratingSum = 0;
+	bool isHeFree = true;
 
 public:
-	Driver() = default;
 	Driver(const MyString& username, const MyString& password,
 		const MyString& firstName, const MyString& lastName,
 		const MyString& carPlate, const MyString& phone);
@@ -24,5 +24,12 @@ public:
 	void setAddress(const Address& address);
 	void setAddress(Address&& address);
 
+	void setFreedom(bool free);
+	bool isFree() const;
+
 	void rate(double newRating);
+
+	bool isClient() const override;
+
+	void print() const override;
 };

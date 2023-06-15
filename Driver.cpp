@@ -36,3 +36,19 @@ void Driver::rate(double newRating)
 	rating = ratingSum / ratingCount;
 }
 
+bool Driver::isClient() const
+{
+	return false;
+}
+
+void Driver::setFreedom(bool free)
+{
+	isHeFree = free;
+}
+
+bool Driver::isFree() const
+{
+	return isHeFree;
+}
+
+

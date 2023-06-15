@@ -31,8 +31,10 @@ public:
 	bool isValidPassword(const MyString& password) const;
 
 	/*TODO: virtual void saveToFile(std::ofstream& ofs) const;
-	TODO: virtual void readFromFile(std::ifstream& ifs);
-	TODO: virtual void print() const;*/
+	TODO: virtual void readFromFile(std::ifstream& ifs);*/
+	virtual void print() const = 0;
+
+	virtual bool isClient() const = 0;
 
 	virtual ~User() = default;
 };

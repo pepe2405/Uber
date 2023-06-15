@@ -30,5 +30,17 @@ Address::Address(const MyString& name, int x, int y, const MyString& description
 	_y = y;
 }
 
+int Address::getX() const
+{
+	return _x;
+}
+
+int Address::getY() const
+{
+	return _y;
+}
+
+
+
 
 

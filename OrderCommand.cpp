@@ -45,6 +45,7 @@ void OrderCommand::execute(Application*  app)
 		Order order(dynamic_cast<Client*>(app->getLoggedUser().operator->()), app->getClosestDriver(orX, orY),
 		            std::move(origin), std::move(destination), passengers);
 		app->addOrder(std::move(order));
+
 	}
 	catch (std::runtime_error& err)
 	{

@@ -42,7 +42,7 @@ class Application
 	DynamicArray<Driver> drivers;
 	DynamicArray<Order> orders;
 
-	Application();
+	Application() = default;
 	Application(const Application& other) = delete;
 	Application& operator=(const Application& other) = delete;
 
@@ -61,8 +61,8 @@ public:
 	void logout();
 
 	const UniquePointer<User>& getLoggedUser() const;
-	LoggedUserType getType() const;
 	UniquePointer<User>& getLoggedUser();
+	LoggedUserType getType() const;
 
 	void addClient(const Client& client);
 	void addClient(Client&& client);
@@ -70,9 +70,17 @@ public:
 	void addDriver(Driver&& driver);
 	void addOrder(Order&& order);
 
-	void cancelOrder(size_t orderId);
-	void pay(size_t orderId, double amount);
+	void cancelOrder(int orderId);
+	void pay(int orderId, double amount);
+	void rateDriver(const MyString& username, double rating);
+
+	void acceptOrder(int id);
+	void declineOrder(int id);
+	void finishOrder(int id);
+	void setMinutes(int id, int minutes);
 
 	Driver* getClosestDriver(int x, int y);
+
+	double getDist(int x1, int y1, int x2, int y2) const;
 };
 
