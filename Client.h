@@ -3,16 +3,16 @@
 
 class Client : public User
 {
+public:
 	Client(const MyString& username, const MyString& password,
 		const MyString& firstName, const MyString& lastName);
 	Client(MyString&& username, MyString&& password,
 		MyString&& firstName, MyString&& lastName);
+	Client() = default;
 
-	/*TODO void saveToFile(std::ofstream& ofs) const override;
-	TODO void readFromFile(std::ifstream& ifs) override;
-	TODO void print() const override;*/
-public:
-	bool isClient() const override;
+	bool isClient() const;
 
-	void print() const override;
+	void saveToFile(std::ofstream& ofs) const override;
+	void readFromFile(std::ifstream& ifs) override;
+	//void print() const override;
 };

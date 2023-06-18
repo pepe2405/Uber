@@ -17,7 +17,7 @@ void CheckOrderCommand::execute(Application* app)
 				return;
 			}
 		}
-		throw std::runtime_error("Order not found");
+		throw std::runtime_error("Order not found\n");
 	}
 	catch (std::runtime_error& rex)
 	{

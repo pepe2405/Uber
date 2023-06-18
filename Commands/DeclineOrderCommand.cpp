@@ -21,7 +21,7 @@ void DeclineOrderCommand::execute(Application* app)
 
 		if (!containsOrder)
 		{
-			throw std::runtime_error("No order with such ID!");
+			throw std::runtime_error("No order with such ID!\n");
 		}
 		app->declineOrder(ordId);
 	}

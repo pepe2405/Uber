@@ -34,6 +34,10 @@ public:
 
 	friend MyString operator+(const MyString& lhs, const MyString& rhs);
 	friend std::istream& operator>>(std::istream&, MyString& str);
+
+
+	void saveToFile(std::ofstream& ofs) const;
+	void readFromFile(std::ifstream& ifs);
 };
 
 std::ostream& operator<<(std::ostream& os, const MyString& str);

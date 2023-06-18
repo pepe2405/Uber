@@ -11,3 +11,13 @@ bool Client::isClient() const
 	return true;
 }
 
+void Client::saveToFile(std::ofstream& ofs) const
+{
+	User::saveToFile(ofs);
+}
+
+void Client::readFromFile(std::ifstream& ifs)
+{
+	User::readFromFile(ifs);
+}
+

@@ -1,6 +1,6 @@
-#include "AcceptOrderCommand.h"
+#include "FinishOrderCommand.h"
 
-void AcceptOrderCommand::execute(Application* app)
+void FinishOrderCommand::execute(Application* app)
 {
 	int ordId = 0;
 	std::cout << "Input order ID: ";
@@ -17,20 +17,12 @@ void AcceptOrderCommand::execute(Application* app)
 				containsOrder = true;
 			}
 		}
-		containsOrder = false;
 
 		if (!containsOrder)
 		{
-			throw std::runtime_error("No order with such ID!");
+			throw std::runtime_error("No order with such ID!\n");
 		}
-		app->acceptOrder(ordId);
-		short minutes = 0;
-		std::cout << "Input minutes: ";
-		std::cin >> minutes;
-		app->setMinutes(ordId, minutes);
-
-
-
+		app->finishOrder(ordId);
 	}
 	catch (std::runtime_error& err)
 	{

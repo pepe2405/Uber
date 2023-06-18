@@ -17,4 +17,10 @@ public:
 
 	int getX() const;
 	int getY() const;
+	const MyString& getName() const;
+	const MyString& getDescr() const;
+
+	void saveToFile(std::ofstream& ofs) const;
+	void readFromFile(std::ifstream& ifs);
+	void print() const;
 };

@@ -38,12 +38,14 @@ public:
 
 	void popBack(); //removes the last element
 
+	bool contains(const T& element);
+
 	void removeAt(size_t index);
 
 	void setAtIndex(const T& element, size_t index);
 	void setAtIndex(T&& element, size_t index);
 
-	size_t getSize() const;
+	int getSize() const;
 	bool isEmpty() const;
 
 	bool contains(const T& element) const;
@@ -224,7 +226,7 @@ void DynamicArray<T>::setAtIndex(T&& element, size_t index)
 }
 
 template <typename T>
-size_t DynamicArray<T>::getSize() const
+int DynamicArray<T>::getSize() const
 {
 	return size;
 }
@@ -263,4 +265,17 @@ T& DynamicArray<T>::operator[](size_t index)
 	if (index > size)
 		throw std::out_of_range("Out of range!");
 	return arr[index];
+}
+
+template <typename T>
+bool DynamicArray<T>::contains(const T& element)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (arr[i] == element)
+		{
+			return true;
+		}
+	}
+	return false;
 }

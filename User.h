@@ -3,6 +3,7 @@
 
 class User
 {
+protected:
 	static int currId;
 
 	int id = 0;
@@ -13,8 +14,7 @@ class User
 	MyString lastName;
 	double balance = 0;
 
-protected:
-	User() = delete;
+	User() = default;
 	User(const MyString& username, const MyString& password,
 		const MyString& firstName, const MyString& lastName);
 	User(MyString&& username, MyString&& password,
@@ -30,11 +30,9 @@ public:
 
 	bool isValidPassword(const MyString& password) const;
 
-	/*TODO: virtual void saveToFile(std::ofstream& ofs) const;
-	TODO: virtual void readFromFile(std::ifstream& ifs);*/
-	virtual void print() const = 0;
-
-	virtual bool isClient() const = 0;
+	virtual void saveToFile(std::ofstream& ofs) const;
+	virtual void readFromFile(std::ifstream& ifs);
+	//virtual void print() const;
 
 	virtual ~User() = default;
 };

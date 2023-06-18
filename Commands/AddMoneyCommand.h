@@ -3,6 +3,7 @@
 
 class AddMoneyCommand : Command
 {
+public:
 	AddMoneyCommand() = default;
 
 	AddMoneyCommand(const AddMoneyCommand&) = delete;

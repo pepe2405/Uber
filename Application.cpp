@@ -1,5 +1,128 @@
 #include "Application.h"
 
+#include <fstream>
+
+void Application::save() const
+{
+	//Save session
+	std::ofstream sof("session.dat", std::ios::out | std::ios::binary);
+	if (!sof.is_open())
+		throw std::runtime_error("Can't open the file!");
+	
+	int id = 0;
+	if (logged == nullptr)
+		id = -1;
+	else
+		id = logged->getId();
+	sof.write((const char*)&id, sizeof id);
+	sof.write((const char*)&type, sizeof type);
+	sof.close();
+
+	//Save clients
+	std::ofstream cof("clients.dat", std::ios::out | std::ios::binary);
+	if (!cof.is_open())
+		throw std::runtime_error("Can't open the file!");
+	const int clCount = clients.getSize();
+	cof.write((const char*)&clCount, sizeof clCount);
+	for (int i = 0; i < clCount; i++)
+		clients[i].saveToFile(cof);
+	cof.close();
+
+	//Save drivers
+	std::ofstream dof("drivers.dat", std::ios::out | std::ios::binary);
+	if (!dof.is_open())
+		throw std::runtime_error("Can't open the file!");
+	const int drCount = drivers.getSize();
+	dof.write((const char*)&drCount, sizeof drCount);
+	for (int i = 0; i < drCount; i++)
+		drivers[i].saveToFile(dof);
+	dof.close();
+
+	//Save orders
+	std::ofstream oof("orders.dat", std::ios::out | std::ios::binary);
+	if (!oof.is_open())
+		throw std::runtime_error("Can't open the file!");
+	const int ordCount = orders.getSize();
+	oof.write((const char*)&ordCount, sizeof ordCount);
+	for (int i = 0; i < ordCount; i++)
+		orders[i].saveToFile(oof);
+	oof.close();
+}
+
+void Application::load()
+{
+	//Load drivers
+	std::ifstream dif("drivers.dat", std::ios::in | std::ios::binary);
+	if (!dif.is_open())
+		throw std::runtime_error("Can't open the file!");
+	int drCount = 0;
+	dif.read((char*)drCount, sizeof drCount);
+	for (int i = 0; i < drCount; i++)
+	{
+		Driver dr;
+		dr.readFromFile(dif);
+		drivers.pushBack(std::move(dr));
+	}
+	dif.close();
+
+	//Load clients
+	std::ifstream cif("clients.dat", std::ios::in | std::ios::binary);
+	if (!cif.is_open())
+		throw std::runtime_error("Can't open the file!");
+	int clCount = 0;
+	cif.read((char*)&clCount, sizeof clCount);
+	for (int i = 0; i < clCount; i++)
+	{
+		Client cl;
+		cl.readFromFile(cif);
+		clients.pushBack(std::move(cl));
+	}
+	cif.close();
+
+	//Load Orders
+	std::ifstream oif("orders.dat", std::ios::in | std::ios::binary);
+	if (!oif.is_open())
+		throw std::runtime_error("Can't open the file!");
+	int ordCount = 0;
+	oif.read((char*)&ordCount, sizeof ordCount);
+	for (int i = 0; i < ordCount; i++)
+	{
+		Order ord;
+		ord.readFromFile(&clients, &drivers, oif);
+		orders.pushBack(std::move(ord));
+	}
+	oif.close();
+
+
+	//Load Session
+	std::ifstream sif("session.dat", std::ios::in | std::ios::binary);
+	if (!sif.is_open())
+		throw std::exception("File not open.");
+	int id = 0;
+	sif.read((char*)&id, sizeof id);
+	LoggedUserType type;
+	sif.read((char*)&type, sizeof type);
+	if (type == LoggedUserType::client)
+	{
+		const int clientsCount = clients.getSize();
+		for (int i = 0; i < clientsCount; i++)
+		{
+			if (clients[i].getId() == id)
+				logged = &clients[i];
+		}
+	}
+	else if (type == LoggedUserType::driver)
+	{
+		const int driversCount = drivers.getSize();
+		for (int i = 0; i < driversCount; i++)
+		{
+			if (drivers[i].getId() == id)
+				logged = &drivers[i];
+		}
+	}
+	sif.close();
+}
+
 Application& Application::getInstance()
 {
 	static Application app;
@@ -75,7 +198,7 @@ void Application::login(const MyString& username, const MyString& password)
 		{
 			if (clients[i].isValidPassword(password))
 			{
-				logged = UniquePointer<User>{ &clients[i] };
+				logged = &clients[i];
 				type = LoggedUserType::client;
 				return;
 			}
@@ -89,7 +212,7 @@ void Application::login(const MyString& username, const MyString& password)
 		{
 			if (drivers[i].isValidPassword(password))
 			{
-				logged = UniquePointer<User>{ &drivers[i] };
+				logged = &drivers[i];
 				type = LoggedUserType::driver;
 				return;
 			}
@@ -104,7 +227,10 @@ void Application::login(MyString&& username, MyString&& password)
 	const int clientCount = clients.getSize();
 	const int driverCount = drivers.getSize();
 	if (driverCount == 0 && clientCount == 0)
-		throw std::runtime_error("No users in the system!");
+	{
+		std::cout << "No users in the system!\n";
+		return;
+	}
 
 
 	for (int i = 0; i < clientCount; i++)
@@ -113,11 +239,12 @@ void Application::login(MyString&& username, MyString&& password)
 		{
 			if (clients[i].isValidPassword(password))
 			{
-				logged = UniquePointer<User>{ &clients[i] };
+				logged = &clients[i];
 				type = LoggedUserType::client;
 				return;
 			}
-			throw std::runtime_error("Wrong password");
+			std::cout << "Wrong password!\n";
+			return;
 		}
 	}
 
@@ -127,14 +254,15 @@ void Application::login(MyString&& username, MyString&& password)
 		{
 			if (drivers[i].isValidPassword(password))
 			{
-				logged = UniquePointer<User>{ &drivers[i] };
+				logged = &drivers[i];
 				type = LoggedUserType::driver;
 				return;
 			}
-			throw std::runtime_error("Wrong password");
+			std::cout << "Wrong password!\n";
+			return;
 		}
 	}
-	throw std::runtime_error("No such username in the system.");
+	std::cout << "No such user in the sytem!\n";
 }
 
 void Application::logout()
@@ -143,12 +271,12 @@ void Application::logout()
 	type = LoggedUserType::none;
 }
 
-UniquePointer<User>& Application::getLoggedUser()
+User* Application::getLoggedUser()
 {
 	return logged;
 }
 
-const UniquePointer<User>& Application::getLoggedUser() const
+const User* Application::getLoggedUser() const
 {
 	return logged;
 }
@@ -192,6 +320,7 @@ void Application::cancelOrder(int orderId)
 		if (orders[i].getId() == orderId)
 		{
 			orders[i].setStatus(OrderStatus::canceled);
+			orders[i].getDriver()->setFree(true);
 			return;
 		}
 	}
@@ -224,7 +353,7 @@ void Application::rateDriver(const MyString& username, double rating)
 	{
 		if (orders[i].getDriver()->getUsername() == username)
 		{
-			if (orders[i].getClient() == getLoggedUser().operator->() && orders[i].getStatus() == OrderStatus::completed)
+			if (orders[i].getClient() == getLoggedUser() && orders[i].getStatus() == OrderStatus::completed)
 			{
 				orders[i].getDriver()->rate(rating);
 				return;
@@ -241,12 +370,13 @@ void Application::acceptOrder(int id)
 	{
 		if (orders[i].getId() == id)
 		{
-			if (orders[i].getDriver() != logged.operator->())
+			if (orders[i].getDriver() != logged)
 				throw std::runtime_error("Not your order!");
 			if (orders[i].getStatus() != OrderStatus::created)
 				throw std::runtime_error("The order is unavailable.");
 			orders[i].setStatus(OrderStatus::accepted);
-			orders[i].getDriver()->setFreedom(false);
+			orders[i].getDriver()->setFree(false);
+			return;
 		}
 	}
 	throw  std::runtime_error("No such order in the system!");
@@ -254,7 +384,16 @@ void Application::acceptOrder(int id)
 
 void Application::declineOrder(int id)
 {
-	//TODO:
+	const int count = orders.getSize();
+	for (int i = 0; i < count; i++)
+	{
+		if (orders[i].getId() == id)
+		{
+			orders[i].addDeclinedId(orders[i].getDriver()->getId());
+			orders[i].setDriver(getClosestDriver(orders[i], orders[i].getOrigin().getX(), orders[i].getOrigin().getY()));
+		}
+	}
+	throw  std::runtime_error("No such order in the system!");
 }
 
 void Application::finishOrder(int id)
@@ -264,15 +403,13 @@ void Application::finishOrder(int id)
 	{
 		if (orders[i].getId() == id)
 		{
-			if (orders[i].getDriver() != logged.operator->())
+			if (orders[i].getDriver() != logged)
 				throw std::runtime_error("Not your order.");
 			if (orders[i].getStatus() != OrderStatus::accepted)
 				throw std::runtime_error("You cant finish this order!");
 			orders[i].setStatus(OrderStatus::completed);
 			orders[i].getDriver()->setAddress(orders[i].getDestinaton());
-			orders[i].getDriver()->setFreedom(true);
-
-			orders.removeAt(i);
+			orders[i].getDriver()->setFree(true);
 			return;
 		}
 	}
@@ -293,9 +430,87 @@ void Application::setMinutes(int id, int minutes)
 	throw std::runtime_error("No such order in the system");
 }
 
+void Application::checkMessages() const
+{
+	const int ordCount = orders.getSize();
+	bool match = false;
+
+	if (getType() == LoggedUserType::client)
+	{
+		const Client* cl = dynamic_cast<Client*>(logged);
+		for (int i = 0; i < ordCount; i++)
+		{
+			Order order = orders[i];
+			if (order.getClient() == cl && order.getStatus() == OrderStatus::accepted)
+			{
+				const Driver& driver = *order.getDriver();
+
+				std::cout << "Your driver " << driver.getFirstName() << " " << driver.getLastName() << " will arrive in " << order.getMinutes() << " minutes!\n";
+				return;
+			}
+		}
+	}
+	else if(getType() == LoggedUserType::driver)
+	{
+		const Driver* dr = dynamic_cast<Driver*>(logged);
+		for (int i = 0; i < ordCount; i++)
+		{
+			Order order = orders[i];
+			if (order.getDriver() == dr && order.getStatus() == OrderStatus::created)
+			{
+				const Client& client = *order.getClient();
+				const Address& origin = order.getOrigin();
+				const Address& dest = order.getDestinaton();
+
+
+				std::cout << client.getFirstName() << " " << client.getLastName() << " has made na order from:\n";
+				std::cout << origin.getName() << " " << origin.getDescr() << " to:\n";
+				std::cout << dest.getName() << dest.getDescr() << std::endl;
+
+				match = true;
+			}
+		}
+	}
+
+
+	if (!match)
+		std::cout << "No messages!\n";
+}
+
 double Application::getDist(int x1, int y1, int x2, int y2) const
 {
 	return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+}
+
+void Application::exitApp() const
+{
+	save();
+	exit(EXIT_SUCCESS);
+}
+
+Driver* Application::getClosestDriver(const Order& order, int x, int y)
+{
+	const int drcount = drivers.getSize();
+	if (drcount == 0)
+		throw std::runtime_error("No drivers available.");
+
+	double minDist = 0;
+	Driver* currMin = nullptr;
+
+	for (int i = 0; i < drcount; i++)
+	{
+		if (drivers[i].isFree() && !order.getDeclinedDriversIds().contains(drivers[i].getId()))
+		{
+			const double dist = getDist(x, y, drivers[i].getAddress().getX(), drivers[i].getAddress().getY());
+			if (dist < minDist)
+			{
+				minDist = dist;
+				currMin = orders[i].getDriver();
+			}
+		}
+	}
+
+	return currMin;
 }
 
 Driver* Application::getClosestDriver(int x, int y)
@@ -307,13 +522,12 @@ Driver* Application::getClosestDriver(int x, int y)
 	double minDist = 0;
 	Driver* currMin = nullptr;
 
-	const int ordCount = orders.getSize();
-	for (int i = 0; i < ordCount; i++)
+	for (int i = 0; i < drcount; i++)
 	{
-		if (orders[i].getStatus() != OrderStatus::accepted)
+		if (drivers[i].isFree())
 		{
-			const double dist = getDist(x, y, orders[i].getDriver()->getAddress().getX(), orders[i].getDriver()->getAddress().getY());
-			if (dist < minDist)
+			const double dist = getDist(x, y, drivers[i].getAddress().getX(), drivers[i].getAddress().getY());
+			if (dist <= minDist)
 			{
 				minDist = dist;
 				currMin = orders[i].getDriver();
@@ -323,4 +537,6 @@ Driver* Application::getClosestDriver(int x, int y)
 
 	return currMin;
 }
+
+
 

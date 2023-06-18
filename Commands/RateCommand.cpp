@@ -19,7 +19,7 @@ void RateCommand::execute(Application* app)
 		}
 		if (!containsDriver)
 		{
-			throw std::runtime_error("Driver doesn't exist.");
+			throw std::runtime_error("Driver doesn't exist.\n");
 		}
 	}
 	catch (std::runtime_error& rex)

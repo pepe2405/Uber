@@ -1,5 +1,6 @@
 #pragma once
 #include "Address.h"
+#include "DynamicArray.hpp"
 #include "User.h"
 
 class Driver : public User
@@ -10,9 +11,10 @@ class Driver : public User
 	Address address = { "Unknown", 0, 0, "" };
 	int ratingCount = 0;
 	double ratingSum = 0;
-	bool isHeFree = true;
+	bool free = true;
 
 public:
+	Driver() = default;
 	Driver(const MyString& username, const MyString& password,
 		const MyString& firstName, const MyString& lastName,
 		const MyString& carPlate, const MyString& phone);
@@ -24,12 +26,13 @@ public:
 	void setAddress(const Address& address);
 	void setAddress(Address&& address);
 
-	void setFreedom(bool free);
-	bool isFree() const;
-
 	void rate(double newRating);
-
-	bool isClient() const override;
-
-	void print() const override;
+	bool isClient() const;
+	
+	bool isFree() const;
+	void setFree(bool el);
+	
+	void saveToFile(std::ofstream& ofs) const override;
+	void readFromFile(std::ifstream& ifs) override;
+	//void print() const override;
 };

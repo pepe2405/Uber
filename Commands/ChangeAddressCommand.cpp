@@ -19,6 +19,6 @@ void ChangeAddressCommand::execute(Application* app)
 
 	Address address{ addressName, adrX, adrY, adrDescr };
 
-	Driver* driver = dynamic_cast<Driver*>(app->getLoggedUser().operator->());
+	Driver* driver = dynamic_cast<Driver*>(app->getLoggedUser());
 	driver->setAddress(std::move(address));
 }

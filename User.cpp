@@ -1,5 +1,7 @@
 #include "User.h"
 
+#include <fstream>
+
 int User::currId = 1;
 
 User::User(const MyString& username, const MyString& password, const MyString& firstName, const MyString& lastName)
@@ -57,6 +59,26 @@ const MyString& User::getUsername() const
 bool User::isValidPassword(const MyString& password) const
 {
 	return this->password == password;
+}
+
+void User::saveToFile(std::ofstream& ofs) const
+{
+	ofs.write((const char*)&id, sizeof id);
+	username.saveToFile(ofs);
+	password.saveToFile(ofs);
+	firstName.saveToFile(ofs);
+	lastName.saveToFile(ofs);
+	ofs.write((const char*)&balance, sizeof balance);
+}
+
+void User::readFromFile(std::ifstream& ifs)
+{
+	ifs.read((char*)&id, sizeof id);
+	username.readFromFile(ifs);
+	password.readFromFile(ifs);
+	firstName.readFromFile(ifs);
+	lastName.readFromFile(ifs);
+	ifs.read((char*)&balance, sizeof balance);
 }
 
 

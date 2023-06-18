@@ -3,7 +3,6 @@
 #include "Driver.h"
 #include "DynamicArray.hpp"
 #include "Order.h"
-#include "UniquePointer.hpp"
 #include "User.h"
 
 enum class LoggedUserType
@@ -13,29 +12,9 @@ enum class LoggedUserType
 	none
 };
 
-enum class clientActions
-{
-	order,
-	check_order,
-	cancel_order,
-	pay,
-	rate,
-	add_money
-};
-
-enum class driverActions
-{
-	change_address,
-	check_messages,
-	accept_order,
-	decline_order,
-	finish_order,
-	accept_payment
-};
-
 class Application
 {
-	UniquePointer<User> logged = nullptr;
+	User* logged = nullptr;
 	LoggedUserType type = LoggedUserType::none;
 
 	DynamicArray<Client> clients;
@@ -45,6 +24,9 @@ class Application
 	Application() = default;
 	Application(const Application& other) = delete;
 	Application& operator=(const Application& other) = delete;
+
+	void save() const;
+	void load();
 
 public:
 	static Application& getInstance();
@@ -60,8 +42,8 @@ public:
 	void login(MyString&& username, MyString&& password);
 	void logout();
 
-	const UniquePointer<User>& getLoggedUser() const;
-	UniquePointer<User>& getLoggedUser();
+	const User* getLoggedUser() const;
+	User* getLoggedUser();
 	LoggedUserType getType() const;
 
 	void addClient(const Client& client);
@@ -78,9 +60,13 @@ public:
 	void declineOrder(int id);
 	void finishOrder(int id);
 	void setMinutes(int id, int minutes);
+	void checkMessages() const;
 
 	Driver* getClosestDriver(int x, int y);
+	Driver* getClosestDriver(const Order& order, int x, int y);
 
 	double getDist(int x1, int y1, int x2, int y2) const;
+
+	void exitApp() const;
 };
 
